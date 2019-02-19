@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="MudModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Maps">
+          <Key>
+            <PropertyRef Name="MapID" />
+          </Key>
+          <Property Name="MapID" Type="smallint" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="1024" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Paths">
+          <Key>
+            <PropertyRef Name="PathID" />
+          </Key>
+          <Property Name="PathID" Type="int" Nullable="false" />
+          <Property Name="CurrMapID" Type="smallint" Nullable="false" />
+          <Property Name="NextMapID" Type="smallint" Nullable="false" />
+          <Property Name="Direction" Type="varchar" MaxLength="64" Nullable="false" />
+          <Property Name="Lock" Type="bit" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Players">
+          <Key>
+            <PropertyRef Name="PlayerID" />
+          </Key>
+          <Property Name="PlayerID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Account" Type="varchar" MaxLength="64" Nullable="false" />
+          <Property Name="Password" Type="varchar" MaxLength="64" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="1024" Nullable="false" />
+          <Property Name="CurrMapID" Type="smallint" Nullable="false" />
+          <Property Name="LoginStep" Type="tinyint" Nullable="false" />
+          <Property Name="ConnectionId" Type="varchar" MaxLength="64" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Path_Map_Curr">
+          <End Role="Maps" Type="Self.Maps" Multiplicity="1" />
+          <End Role="Paths" Type="Self.Paths" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Maps">
+              <PropertyRef Name="MapID" />
+            </Principal>
+            <Dependent Role="Paths">
+              <PropertyRef Name="CurrMapID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Path_Map_Next">
+          <End Role="Maps" Type="Self.Maps" Multiplicity="1" />
+          <End Role="Paths" Type="Self.Paths" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Maps">
+              <PropertyRef Name="MapID" />
+            </Principal>
+            <Dependent Role="Paths">
+              <PropertyRef Name="NextMapID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Player_Map">
+          <End Role="Maps" Type="Self.Maps" Multiplicity="1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Maps">
+              <PropertyRef Name="MapID" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="CurrMapID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MudModelStoreContainer">
+          <EntitySet Name="Maps" EntityType="Self.Maps" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Paths" EntityType="Self.Paths" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Players" EntityType="Self.Players" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Path_Map_Curr" Association="Self.FK_Path_Map_Curr">
+            <End Role="Maps" EntitySet="Maps" />
+            <End Role="Paths" EntitySet="Paths" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Path_Map_Next" Association="Self.FK_Path_Map_Next">
+            <End Role="Maps" EntitySet="Maps" />
+            <End Role="Paths" EntitySet="Paths" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Player_Map" Association="Self.FK_Player_Map">
+            <End Role="Maps" EntitySet="Maps" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MudModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Map">
+          <Key>
+            <PropertyRef Name="MapID" />
+          </Key>
+          <Property Name="MapID" Type="Int16" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Paths" Relationship="Self.FK_Path_Map_Curr" FromRole="Maps" ToRole="Paths" />
+          <NavigationProperty Name="Paths1" Relationship="Self.FK_Path_Map_Next" FromRole="Maps" ToRole="Paths" />
+          <NavigationProperty Name="Players" Relationship="Self.FK_Player_Map" FromRole="Maps" ToRole="Players" />
+        </EntityType>
+        <EntityType Name="Path">
+          <Key>
+            <PropertyRef Name="PathID" />
+          </Key>
+          <Property Name="PathID" Type="Int32" Nullable="false" />
+          <Property Name="CurrMapID" Type="Int16" Nullable="false" />
+          <Property Name="NextMapID" Type="Int16" Nullable="false" />
+          <Property Name="Direction" Type="String" MaxLength="64" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Lock" Type="Boolean" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Map" Relationship="Self.FK_Path_Map_Curr" FromRole="Paths" ToRole="Maps" />
+          <NavigationProperty Name="Map1" Relationship="Self.FK_Path_Map_Next" FromRole="Paths" ToRole="Maps" />
+        </EntityType>
+        <EntityType Name="Player">
+          <Key>
+            <PropertyRef Name="PlayerID" />
+          </Key>
+          <Property Name="PlayerID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Account" Type="String" MaxLength="64" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="64" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CurrMapID" Type="Int16" Nullable="false" />
+          <Property Name="LoginStep" Type="Byte" Nullable="false" />
+          <Property Name="ConnectionId" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Map" Relationship="Self.FK_Player_Map" FromRole="Players" ToRole="Maps" />
+        </EntityType>
+        <Association Name="FK_Path_Map_Curr">
+          <End Role="Maps" Type="Self.Map" Multiplicity="1" />
+          <End Role="Paths" Type="Self.Path" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Maps">
+              <PropertyRef Name="MapID" />
+            </Principal>
+            <Dependent Role="Paths">
+              <PropertyRef Name="CurrMapID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Path_Map_Next">
+          <End Role="Maps" Type="Self.Map" Multiplicity="1" />
+          <End Role="Paths" Type="Self.Path" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Maps">
+              <PropertyRef Name="MapID" />
+            </Principal>
+            <Dependent Role="Paths">
+              <PropertyRef Name="NextMapID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Player_Map">
+          <End Role="Maps" Type="Self.Map" Multiplicity="1" />
+          <End Role="Players" Type="Self.Player" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Maps">
+              <PropertyRef Name="MapID" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="CurrMapID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MudEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Maps" EntityType="Self.Map" />
+          <EntitySet Name="Paths" EntityType="Self.Path" />
+          <EntitySet Name="Players" EntityType="Self.Player" />
+          <AssociationSet Name="FK_Path_Map_Curr" Association="Self.FK_Path_Map_Curr">
+            <End Role="Maps" EntitySet="Maps" />
+            <End Role="Paths" EntitySet="Paths" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Path_Map_Next" Association="Self.FK_Path_Map_Next">
+            <End Role="Maps" EntitySet="Maps" />
+            <End Role="Paths" EntitySet="Paths" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Player_Map" Association="Self.FK_Player_Map">
+            <End Role="Maps" EntitySet="Maps" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MudModelStoreContainer" CdmEntityContainer="MudEntities">
+          <EntitySetMapping Name="Maps">
+            <EntityTypeMapping TypeName="MudModel.Map">
+              <MappingFragment StoreEntitySet="Maps">
+                <ScalarProperty Name="MapID" ColumnName="MapID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Paths">
+            <EntityTypeMapping TypeName="MudModel.Path">
+              <MappingFragment StoreEntitySet="Paths">
+                <ScalarProperty Name="PathID" ColumnName="PathID" />
+                <ScalarProperty Name="CurrMapID" ColumnName="CurrMapID" />
+                <ScalarProperty Name="NextMapID" ColumnName="NextMapID" />
+                <ScalarProperty Name="Direction" ColumnName="Direction" />
+                <ScalarProperty Name="Lock" ColumnName="Lock" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Players">
+            <EntityTypeMapping TypeName="MudModel.Player">
+              <MappingFragment StoreEntitySet="Players">
+                <ScalarProperty Name="PlayerID" ColumnName="PlayerID" />
+                <ScalarProperty Name="Account" ColumnName="Account" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="CurrMapID" ColumnName="CurrMapID" />
+                <ScalarProperty Name="LoginStep" ColumnName="LoginStep" />
+                <ScalarProperty Name="ConnectionId" ColumnName="ConnectionId" />
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="無" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
